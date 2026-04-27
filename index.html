@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoftWeb — Catálogo de Servicios TI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080810;--s1:#0f0f1c;--s2:#16162a;--s3:#1e1e35;
+  --acc:#5b5ef4;--acc2:#00e5b0;--acc3:#ff5f6d;--acc4:#f5c542;
+  --txt:#eeeeff;--muted:#8888bb;
+}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(91,94,244,.14) 0%,transparent 70%),
+             radial-gradient(ellipse 50% 40% at 80% 90%,rgba(0,229,176,.08) 0%,transparent 70%);z-index:0}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+#loginScreen.gone{display:none}
+.login-wrap{width:100%;max-width:420px;padding:1rem;position:relative;z-index:1}
+.login-card{background:var(--s1);border:1px solid rgba(91,94,244,.3);border-radius:24px;padding:2.5rem;box-shadow:0 0 80px rgba(91,94,244,.12)}
+.brand{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-1px;margin-bottom:.25rem}
+.brand span{color:var(--acc)}
+.brand-sub{color:var(--muted);font-size:.83rem;margin-bottom:2rem}
+.fld{margin-bottom:1.2rem}
+.fld label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:.45rem}
+.fld input{width:100%;background:var(--s2);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:.72rem 1rem;color:var(--txt);font-family:inherit;font-size:.92rem;outline:none;transition:border-color .2s}
+.fld input:focus{border-color:var(--acc)}
+.fld input::placeholder{color:rgba(136,136,187,.4)}
+.err-msg{background:rgba(255,95,109,.1);border:1px solid rgba(255,95,109,.3);border-radius:8px;padding:.55rem .85rem;font-size:.8rem;color:var(--acc3);margin-bottom:1rem;display:none}
+.login-btn{width:100%;background:var(--acc);border:none;border-radius:10px;padding:.85rem;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all .2s;margin-top:.25rem}
+.login-btn:hover{background:#7476f7;transform:translateY(-1px)}
+.hint{text-align:center;font-size:.78rem;color:var(--muted);margin-top:1.25rem}
+.hint b{color:var(--acc2)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(8,8,16,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:62px;position:relative}
+.nav-logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.5px}
+.nav-logo span{color:var(--acc)}
+.nav-right{display:flex;align-items:center;gap:.75rem}
+.nav-user{display:flex;align-items:center;gap:.5rem;font-size:.83rem;color:var(--muted)}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0}
+.cart-btn{background:var(--s2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.45rem .95rem;cursor:pointer;font-family:inherit;color:var(--txt);font-size:.83rem;display:flex;align-items:center;gap:.5rem;transition:all .2s}
+.cart-btn:hover{border-color:var(--acc);background:rgba(91,94,244,.12)}
+.cart-dot{background:var(--acc);color:#fff;border-radius:50%;width:18px;height:18px;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;min-width:18px}
+.out-btn{background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.38rem .75rem;cursor:pointer;font-family:inherit;color:var(--muted);font-size:.78rem;transition:all .2s}
+.out-btn:hover{border-color:var(--acc3);color:var(--acc3)}
+
+/* MAIN */
+main{position:relative;z-index:1;max-width:1260px;margin:0 auto;padding:2rem}
+.hero{text-align:center;padding:3.5rem 1rem 2.5rem}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;letter-spacing:-2px;line-height:1.08;margin-bottom:.9rem}
+.hero h1 em{font-style:normal;color:var(--acc)}
+.hero p{color:var(--muted);font-size:.95rem;max-width:480px;margin:0 auto;line-height:1.65}
+
+/* FILTERS */
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.75rem}
+.ftag{background:var(--s2);border:1px solid rgba(255,255,255,.07);border-radius:100px;padding:.38rem 1rem;cursor:pointer;font-family:inherit;font-size:.8rem;color:var(--muted);transition:all .2s}
+.ftag:hover,.ftag.on{background:rgba(91,94,244,.15);border-color:var(--acc);color:var(--acc)}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.2rem}
+.card{background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:18px;overflow:hidden;transition:all .28s;display:flex;flex-direction:column}
+.card:hover{border-color:rgba(91,94,244,.4);box-shadow:0 4px 40px rgba(91,94,244,.12);transform:translateY(-3px)}
+.card-top{padding:1.4rem 1.4rem .9rem;display:flex;align-items:flex-start;justify-content:space-between}
+.icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.35rem}
+.badge{font-size:.68rem;font-weight:600;padding:.22rem .6rem;border-radius:100px;text-transform:uppercase;letter-spacing:.4px}
+.bi{background:rgba(91,94,244,.18);color:#9b9df8}
+.bc{background:rgba(0,229,176,.14);color:var(--acc2)}
+.bs{background:rgba(255,95,109,.14);color:#ff8a94}
+.bp{background:rgba(245,197,66,.14);color:var(--acc4)}
+.bd{background:rgba(100,180,255,.14);color:#7ec8ff}
+.bm{background:rgba(200,100,255,.14);color:#cc80ff}
+.card-body{padding:0 1.4rem .9rem;flex:1}
+.card-body h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.35rem}
+.card-body p{font-size:.8rem;color:var(--muted);line-height:1.6}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.65rem}
+.tag{font-size:.68rem;background:var(--s3);border-radius:6px;padding:.2rem .5rem;color:var(--muted)}
+.card-foot{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.price{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;white-space:nowrap}
+.price small{font-family:'DM Sans',sans-serif;font-weight:400;font-size:.72rem;color:var(--muted)}
+.card-actions{display:flex;align-items:center;gap:.5rem}
+.qty{display:flex;align-items:center;gap:.35rem}
+.qbtn{background:var(--s3);border:1px solid rgba(255,255,255,.07);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--txt);font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;font-family:inherit}
+.qbtn:hover{border-color:var(--acc);color:var(--acc)}
+.qnum{min-width:18px;text-align:center;font-weight:600;font-size:.85rem}
+.add-btn{background:var(--acc);border:1px solid transparent;border-radius:8px;padding:.42rem .9rem;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.add-btn:hover{background:#7476f7}
+.add-btn.added{background:rgba(0,229,176,.15);color:var(--acc2);border-color:rgba(0,229,176,.3)}
+
+/* CART PANEL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:150;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.on{opacity:1;pointer-events:all}
+.cart{position:fixed;right:0;top:0;bottom:0;width:min(420px,100vw);background:var(--s1);border-left:1px solid rgba(255,255,255,.08);z-index:151;transform:translateX(105%);transition:transform .32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.cart.on{transform:translateX(0)}
+.cart-hd{padding:1.4rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
+.cart-hd h2{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800}
+.x-btn{background:var(--s2);border:1px solid rgba(255,255,255,.08);border-radius:8px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.1rem;transition:all .2s;font-family:inherit}
+.x-btn:hover{border-color:var(--acc3);color:var(--acc3)}
+.cart-body{flex:1;overflow-y:auto;padding:1rem 1.5rem}
+.cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:.75rem;color:var(--muted);font-size:.88rem}
+.empty-ico{font-size:2.8rem;opacity:.25}
+.ci{display:flex;align-items:flex-start;gap:.85rem;padding:.85rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.ci-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.ci-info{flex:1}
+.ci-info h4{font-size:.85rem;font-weight:600;margin-bottom:.15rem}
+.ci-info .cprice{font-size:.75rem;color:var(--muted)}
+.ci-ctrl{display:flex;align-items:center;gap:.35rem;margin-top:.4rem}
+.cqbtn{background:var(--s3);border:1px solid rgba(255,255,255,.07);border-radius:5px;width:22px;height:22px;cursor:pointer;color:var(--txt);font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;font-family:inherit}
+.cqbtn:hover{border-color:var(--acc);color:var(--acc)}
+.cqnum{min-width:14px;text-align:center;font-size:.82rem;font-weight:600}
+.ci-del{background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:.95rem;padding:.2rem;transition:color .2s;margin-left:.25rem}
+.ci-del:hover{color:var(--acc3)}
+.ci-total{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;white-space:nowrap;padding-top:.2rem}
+.cart-ft{padding:1.4rem 1.5rem;border-top:1px solid rgba(255,255,255,.07)}
+.summary-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.summary-row .lbl{color:var(--muted);font-size:.83rem}
+.summary-row .tot{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem}
+.checkout{width:100%;background:linear-gradient(135deg,var(--acc),#8b8ef8);border:none;border-radius:12px;padding:.95rem;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s}
+.checkout:hover{opacity:.9;transform:translateY(-1px)}
+.clear{width:100%;background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.55rem;color:var(--muted);font-family:inherit;font-size:.8rem;cursor:pointer;margin-top:.65rem;transition:all .2s}
+.clear:hover{border-color:var(--acc3);color:var(--acc3)}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s3);border:1px solid rgba(0,229,176,.3);border-radius:100px;padding:.55rem 1.3rem;font-size:.82rem;color:var(--acc2);z-index:400;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-bg.on{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid rgba(91,94,244,.35);border-radius:22px;padding:2.2rem;width:min(460px,90vw);text-align:center}
+.modal h2{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:.5rem}
+.modal p{color:var(--muted);font-size:.87rem;line-height:1.65;margin-bottom:1.5rem}
+.modal-order{background:var(--s2);border-radius:12px;padding:1rem;margin-bottom:1.5rem;text-align:left;max-height:220px;overflow-y:auto}
+.mo-item{display:flex;justify-content:space-between;font-size:.83rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.mo-item:last-child{border-bottom:none;font-weight:600;padding-top:.6rem;margin-top:.25rem}
+.modal-close{background:var(--acc);border:none;border-radius:10px;padding:.75rem 2rem;color:#fff;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;font-size:.9rem;transition:all .2s}
+.modal-close:hover{background:#7476f7}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="brand">Tech<span>Core</span></div>
+      <div class="brand-sub">Portal de Servicios TI &mdash; Acceso Corporativo</div>
+      <div class="err-msg" id="errMsg">&#x26A0; Usuario o contrase&ntilde;a incorrectos.</div>
+      <div class="fld">
+        <label>Usuario</label>
+        <input type="text" id="uInput" placeholder="usuario@empresa.com" autocomplete="username">
+      </div>
+      <div class="fld">
+        <label>Contrase&ntilde;a</label>
+        <input type="password" id="pInput" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password">
+      </div>
+      <button class="login-btn" onclick="doLogin()">Iniciar Sesi&oacute;n</button>
+      <div class="hint">Demo: usuario <b>admin</b> &middot; contrase&ntilde;a <b>1234</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav id="navBar" class="hidden" style="position:sticky;top:0;z-index:100;background:rgba(8,8,16,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:62px">
+  <div class="nav-logo">Tech<span>Core</span></div>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="avatar" id="navAvatar">AD</div>
+      <span id="navName">Admin</span>
+    </div>
+    <button class="cart-btn" onclick="toggleCart()">
+      &#128722; Carrito <div class="cart-dot" id="cartDot">0</div>
+    </button>
+    <button class="out-btn" onclick="doLogout()">Salir</button>
+  </div>
+</nav>
+
+<!-- ── APP ── -->
+<main id="mainApp" class="hidden">
+  <div class="hero">
+    <h1>Servicios <em>TI</em> a la<br>medida de tu empresa</h1>
+    <p>Selecciona, configura y solicita los servicios tecnol&oacute;gicos que tu organizaci&oacute;n necesita.</p>
+  </div>
+  <div class="filters" id="filters">
+    <button class="ftag on" data-cat="all">Todos</button>
+    <button class="ftag" data-cat="infraestructura">Infraestructura</button>
+    <button class="ftag" data-cat="desarrollo">Desarrollo</button>
+  </div>
+  <div class="grid" id="serviceGrid"></div>
+</main>
+
+<!-- ── OVERLAY + CART ── -->
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
+<div class="cart" id="cartPanel">
+  <div class="cart-hd">
+    <h2>&#128722; Mi Carrito</h2>
+    <button class="x-btn" onclick="toggleCart()">&#x2715;</button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-ft" id="cartFt" style="display:none">
+    <div class="summary-row">
+      <span class="lbl">Total mensual estimado</span>
+      <span class="tot" id="cartTotal">$0</span>
+    </div>
+    <button class="checkout" onclick="doCheckout()">Solicitar Servicios &#x2192;</button>
+    <button class="clear" onclick="clearCart()">Vaciar carrito</button>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<!-- ── CHECKOUT MODAL ── -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div style="font-size:2.5rem;margin-bottom:.75rem">&#9989;</div>
+    <h2>&#161;Solicitud enviada!</h2>
+    <p>Tu solicitud fue registrada correctamente. El equipo de TI la revisar&aacute; y te contactar&aacute; en menos de 24 horas.</p>
+    <div class="modal-order" id="modalOrder"></div>
+    <button class="modal-close" onclick="closeModal()">Aceptar</button>
+  </div>
+</div>
+
+<script>
+const services=[
+  {id:1,name:"Servidor Virtual (VPS)",cat:"infraestructura",icon:"🖥️",bg:"#1a1a3a",badge:"bi",bl:"Infraestructura",
+   desc:"Servidor virtual dedicado con recursos garantizados, acceso root y monitoreo 24/7.",
+   tags:["Linux","Windows","SLA 99.9%"],price:1800,unit:"mes"},
+  {id:2,name:"Desarrollo de Software",cat:"desarrollo",icon:"💻",bg:"#0e1e35",badge:"bd",bl:"Desarrollo",
+   desc:"Equipo dedicado de developers full-stack para proyectos web, móvil y APIs REST.",
+   tags:["React","Node","Flutter"],price:12000,unit:"mes"},
+  {id:3,name:"Backup y Recuperación",cat:"infraestructura",icon:"💾",bg:"#1a1a3a",badge:"bi",bl:"Infraestructura",
+   desc:"Respaldo automático de datos críticos con replicación offsite y pruebas de restauración.",
+   tags:["Veeam","S3","RPO 4hr"],price:1200,unit:"mes"},
+  {id:4,name:"Creacion de Paginas Web",cat:"web",icon:"🔒",bg:"#2a2310",badge:"bi",bl:"Desarrollo",
+    desc:"Servicio enfocado en el diseño, desarrollo y publicación de páginas web profesionales.",
+    tags:["NegocioOnline","WebService"],price:1500,unit:"mes"},
+];
+
+const cart={};
+const pendingQty={};
+let activeCat='all';
+
+// ── LOGIN ──────────────────────────────────────────────
+['uInput','pInput'].forEach(id=>
+  document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})
+);
+
+function doLogin(){
+  const u=document.getElementById('uInput').value.trim();
+  const p=document.getElementById('pInput').value;
+  const err=document.getElementById('errMsg');
+  if(u==='admin'&&p==='1234'){
+    err.style.display='none';
+    document.getElementById('loginScreen').classList.add('gone');
+    document.getElementById('navBar').classList.remove('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('navAvatar').textContent=u.slice(0,2).toUpperCase();
+    document.getElementById('navName').textContent=u;
+    renderCards();
+  }else{
+    err.style.display='block';
+    document.getElementById('pInput').value='';
+    document.getElementById('pInput').focus();
+  }
+}
+
+function doLogout(){location.reload()}
+
+// ── CARDS ──────────────────────────────────────────────
+function renderCards(){
+  const list=activeCat==='all'?services:services.filter(s=>s.cat===activeCat);
+  document.getElementById('serviceGrid').innerHTML=list.map(s=>`
+    <div class="card" id="card-${s.id}">
+      <div class="card-top">
+        <div class="icon" style="background:${s.bg}">${s.icon}</div>
+        <span class="badge ${s.badge}">${s.bl}</span>
+      </div>
+      <div class="card-body">
+        <h3>${s.name}</h3>
+        <p>${s.desc}</p>
+        <div class="tags">${s.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+      <div class="card-foot">
+        <div class="price">$${s.price.toLocaleString('es-MX')}<small>/${s.unit}</small></div>
+        <div class="card-actions">
+          <div class="qty">
+            <button class="qbtn" onclick="changeQty(${s.id},-1)">&#8722;</button>
+            <span class="qnum" id="qty-${s.id}">${pendingQty[s.id]||1}</span>
+            <button class="qbtn" onclick="changeQty(${s.id},1)">&#43;</button>
+          </div>
+          <button class="add-btn${cart[s.id]?' added':''}" id="abtn-${s.id}" onclick="addToCart(${s.id})">
+            ${cart[s.id]?'&#10003; Agregado':'Agregar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function changeQty(id,d){
+  pendingQty[id]=Math.max(1,(pendingQty[id]||1)+d);
+  const el=document.getElementById('qty-'+id);
+  if(el)el.textContent=pendingQty[id];
+}
+
+function addToCart(id){
+  const q=pendingQty[id]||1;
+  cart[id]=(cart[id]||0)+q;
+  pendingQty[id]=1;
+  const qel=document.getElementById('qty-'+id);
+  if(qel)qel.textContent=1;
+  const btn=document.getElementById('abtn-'+id);
+  if(btn){btn.innerHTML='&#10003; Agregado';btn.classList.add('added');}
+  updateCount();renderCartBody();
+  showToast(services.find(s=>s.id===id).icon+' '+services.find(s=>s.id===id).name+' agregado');
+}
+
+// ── CART ───────────────────────────────────────────────
+function toggleCart(){
+  document.getElementById('cartPanel').classList.toggle('on');
+  document.getElementById('overlay').classList.toggle('on');
+  renderCartBody();
+}
+
+function updateCount(){
+  const n=Object.values(cart).reduce((a,b)=>a+b,0);
+  document.getElementById('cartDot').textContent=n;
+}
+
+function renderCartBody(){
+  const body=document.getElementById('cartBody');
+  const ft=document.getElementById('cartFt');
+  const ids=Object.keys(cart).filter(k=>cart[k]>0);
+  if(!ids.length){
+    body.innerHTML='<div class="cart-empty"><div class="empty-ico">&#128722;</div><span>Tu carrito está vacío</span></div>';
+    ft.style.display='none';return;
+  }
+  ft.style.display='block';
+  let total=0;
+  body.innerHTML=ids.map(id=>{
+    const s=services.find(x=>x.id==id);
+    const sub=s.price*cart[id];total+=sub;
+    return`<div class="ci">
+      <div class="ci-icon" style="background:${s.bg}">${s.icon}</div>
+      <div class="ci-info">
+        <h4>${s.name}</h4>
+        <div class="cprice">$${s.price.toLocaleString('es-MX')}/${s.unit}</div>
+        <div class="ci-ctrl">
+          <button class="cqbtn" onclick="cartAdj(${id},-1)">&#8722;</button>
+          <span class="cqnum" id="cq-${id}">${cart[id]}</span>
+          <button class="cqbtn" onclick="cartAdj(${id},1)">&#43;</button>
+          <button class="ci-del" title="Eliminar" onclick="removeItem(${id})">&#128465;</button>
+        </div>
+      </div>
+      <div class="ci-total">$${sub.toLocaleString('es-MX')}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent='$'+total.toLocaleString('es-MX');
+}
+
+function cartAdj(id,d){
+  cart[id]=Math.max(1,(cart[id]||1)+d);
+  updateCount();renderCartBody();
+}
+
+function removeItem(id){
+  delete cart[id];
+  const btn=document.getElementById('abtn-'+id);
+  if(btn){btn.innerHTML='Agregar';btn.classList.remove('added');}
+  updateCount();renderCartBody();
+}
+
+function clearCart(){
+  Object.keys(cart).forEach(id=>{
+    delete cart[id];
+    const btn=document.getElementById('abtn-'+id);
+    if(btn){btn.innerHTML='Agregar';btn.classList.remove('added');}
+  });
+  updateCount();renderCartBody();
+}
+
+// ── CHECKOUT ───────────────────────────────────────────
+function doCheckout(){
+  const ids=Object.keys(cart).filter(k=>cart[k]>0);
+  if(!ids.length)return;
+  let html='';let total=0;
+  ids.forEach(id=>{
+    const s=services.find(x=>x.id==id);
+    const sub=s.price*cart[id];total+=sub;
+    html+=`<div class="mo-item"><span>${s.icon} ${s.name} &times; ${cart[id]}</span><span>$${sub.toLocaleString('es-MX')}</span></div>`;
+  });
+  html+=`<div class="mo-item"><span><b>Total mensual</b></span><span><b>$${total.toLocaleString('es-MX')}</b></span></div>`;
+  document.getElementById('modalOrder').innerHTML=html;
+  document.getElementById('modalBg').classList.add('on');
+  document.getElementById('cartPanel').classList.remove('on');
+  document.getElementById('overlay').classList.remove('on');
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('on');
+  clearCart();
+}
+
+// ── FILTERS ────────────────────────────────────────────
+document.getElementById('filters').addEventListener('click',e=>{
+  const btn=e.target.closest('.ftag');if(!btn)return;
+  document.querySelectorAll('.ftag').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');activeCat=btn.dataset.cat;renderCards();
+});
+
+// ── TOAST ──────────────────────────────────────────────
+let tt;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent='✓ '+msg;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2300);
+}
+</script>
+</body>
+</html>
